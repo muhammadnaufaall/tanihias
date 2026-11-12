@@ -1,26 +1,126 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-bricolage), var(--font-jakarta), sans-serif;
+  --font-tag: var(--font-kalam), cursive;
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-bloom: var(--bloom);
+  --color-bloom-foreground: var(--bloom-foreground);
+  --color-greenhouse: var(--greenhouse);
+  --animate-grow: grow 640ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/*
+ * Tanihias palette
+ * mist        #EFF3EE  background, morning mist over the Cihideung highlands
+ * polybag     #17211B  text, the greenish black of plant polybags
+ * leaf        #1E5B3C  primary
+ * shoot       #D9E8D3  soft surfaces, chips
+ * bloom       #D23B73  accent, chrysanthemum pink (West Bandung's main crop)
+ * greenhouse  #DCE9D6  UV greenhouse plastic (hero)
+ */
+:root {
+  --background: #eff3ee;
+  --foreground: #17211b;
+  --card: #ffffff;
+  --card-foreground: #17211b;
+  --popover: #ffffff;
+  --popover-foreground: #17211b;
+  --primary: #1e5b3c;
+  --primary-foreground: #f4faf5;
+  --secondary: #d9e8d3;
+  --secondary-foreground: #17211b;
+  --muted: #e3eae1;
+  --muted-foreground: #56665b;
+  --accent: #e3eae1;
+  --accent-foreground: #17211b;
+  --destructive: #b42318;
+  --border: #d3ddd1;
+  --input: #c6d2c4;
+  --ring: #1e5b3c;
+  --bloom: #d23b73;
+  --bloom-foreground: #ffffff;
+  --greenhouse: #dce9d6;
+  --radius: 0.625rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+  }
+  h1, h2, h3 {
+    @apply font-heading tracking-tight;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Greenhouse roof ribs: thin vertical lines on UV plastic */
+  .greenhouse-film {
+    background-color: var(--greenhouse);
+    background-image:
+      linear-gradient(180deg, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0) 60%),
+      repeating-linear-gradient(
+        90deg,
+        rgb(30 91 60 / 0.07) 0 1px,
+        transparent 1px 56px
+      );
+  }
+
+  /* Plant tag: white plastic with a pointed end for pushing into the pot */
+  .plant-tag {
+    clip-path: polygon(0 0, 100% 0, 100% 74%, 50% 100%, 0 74%);
+  }
+}
+
+@keyframes grow {
+  from {
+    opacity: 0;
+    translate: 0 18px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-grow {
+    animation: none;
+  }
 }
