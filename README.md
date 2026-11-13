@@ -91,7 +91,7 @@ There is no `messages` table because conversations happen over WhatsApp links, p
 | ----------------------------- | ----------------------------------------- | --------- | -------------- |
 | `/`                           | Home: search, plant types, latest products | 3.13      | Public         |
 | `/catalog`                    | Catalog, search, filters, sorting         | 3.9       | Public         |
-| `/products/[id]`              | Product detail + WhatsApp button          | 3.10      | Signed in      |
+| `/products/[id]`              | Product detail + WhatsApp button; the owning farmer also sees a "Tampilan pembeli" preview bar | 3.10 | Signed in |
 | `/login`, `/register`         | Sign in and sign up                       | 3.7       | Public         |
 | `/farmer`                     | My products                               | 3.11      | Farmer         |
 | `/farmer/products/new`        | Add product                               | 3.12      | Farmer         |

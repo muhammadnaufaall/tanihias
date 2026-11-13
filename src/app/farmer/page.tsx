@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { CircleAlert, Pencil, Plus, Trash2 } from "lucide-react";
+import { CircleAlert, Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import { deleteMyProduct } from "@/actions/farmer";
 import { ActionButton } from "@/components/dashboard/action-button";
 import { PageHeader } from "@/components/dashboard/dashboard-shell";
@@ -12,7 +12,7 @@ import { PlantImage } from "@/components/plant-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getFarmerBusiness, listBusinessProducts } from "@/lib/data";
+import { getFarmerBusiness, isValidUuid, listBusinessProducts } from "@/lib/data";
 import { formatDate, formatPriceRange } from "@/lib/format";
 import { requireSession } from "@/lib/session";
 
@@ -54,13 +54,19 @@ async function MyProductList({ searchParams }: { searchParams: PageProps<"/farme
   const products = business ? await listBusinessProducts(business.id) : [];
 
   const statusMessage = typeof sp.status === "string" ? statusMessages[sp.status] : undefined;
+  const savedProductId = typeof sp.product === "string" && isValidUuid(sp.product) ? sp.product : undefined;
   const totalPages = Math.max(1, Math.ceil(products.length / PER_PAGE));
   const page = Math.min(Math.max(1, Number(sp.page) || 1), totalPages);
   const visible = products.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   return (
     <div className="flex flex-col gap-5">
-      {statusMessage && <FlashToast message={statusMessage} />}
+      {statusMessage && (
+        <FlashToast
+          message={statusMessage}
+          action={savedProductId ? { label: "Lihat", href: `/products/${savedProductId}` } : undefined}
+        />
+      )}
 
       {business && !business.whatsapp_number && (
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-bloom/30 bg-bloom/5 p-4 text-sm">
@@ -130,6 +136,12 @@ async function MyProductList({ searchParams }: { searchParams: PageProps<"/farme
                   </TableCell>
                   <TableCell className="pr-4">
                     <div className="flex justify-end gap-2">
+                      <Button asChild variant="ghost" size="sm">
+                        <Link href={`/products/${p.id}`} aria-label={`Lihat ${p.name} seperti pembeli`}>
+                          <Eye aria-hidden />
+                          Lihat
+                        </Link>
+                      </Button>
                       <Button asChild variant="outline" size="sm">
                         <Link href={`/farmer/products/${p.id}/edit`}>
                           <Pencil aria-hidden />

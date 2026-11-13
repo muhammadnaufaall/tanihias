@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { ChevronRight, MapPin, MessageCircle } from "lucide-react";
+import { ArrowLeft, ChevronRight, Eye, MapPin, MessageCircle, Pencil } from "lucide-react";
 import { CardGridSkeleton } from "@/components/loading-skeletons";
 import { PlantTag } from "@/components/plant-tag";
 import { ProductCard } from "@/components/product-card";
@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getOtherBusinessProducts, getProduct } from "@/lib/data";
+import { getFarmerBusiness, getOtherBusinessProducts, getProduct } from "@/lib/data";
 import { formatPriceRange, formatPriceTag, initials, whatsappLink } from "@/lib/format";
 import { requireSession } from "@/lib/session";
 
@@ -27,14 +27,20 @@ export default function ProductPage({ params }: PageProps<"/products/[id]">) {
 
 async function ProductDetail({ params }: { params: PageProps<"/products/[id]">["params"] }) {
   const [{ id }, session] = await Promise.all([params, requireSession()]);
-  const product = await getProduct(id);
+  const [product, ownBusiness] = await Promise.all([
+    getProduct(id),
+    session.role === "farmer" ? getFarmerBusiness(session.id) : null,
+  ]);
   if (!product) notFound();
 
   const { business } = product;
+  const isOwner = ownBusiness?.id === product.business_id;
   const whatsappMessage = `Halo ${business.business_name}, saya ${session.name}. Saya lihat "${product.name}" di Tanihias. Apakah masih tersedia?`;
 
   return (
     <>
+      {isOwner && <OwnerPreviewBar productId={product.id} />}
+
       <nav aria-label="Breadcrumb" className="mb-6 flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
         <Link href="/catalog" className="hover:text-foreground">
           Katalog
@@ -116,6 +122,37 @@ async function ProductDetail({ params }: { params: PageProps<"/products/[id]">["
         </Suspense>
       </section>
     </>
+  );
+}
+
+// Shown only to the farmer who owns the product. Everything below it is
+// exactly what buyers see, so the farmer can check their listing.
+function OwnerPreviewBar({ productId }: { productId: string }) {
+  return (
+    <aside
+      aria-label="Pratinjau penjual"
+      className="mb-6 flex flex-wrap items-center gap-3 rounded-xl border border-primary/25 bg-primary/5 p-4 text-sm"
+    >
+      <Eye aria-hidden className="size-5 shrink-0 text-primary" />
+      <div className="min-w-48 flex-1">
+        <p className="font-semibold">Tampilan pembeli</p>
+        <p className="text-muted-foreground">Begini produkmu terlihat oleh pembeli. Hanya kamu yang melihat kotak ini.</p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Button asChild variant="ghost">
+          <Link href="/farmer">
+            <ArrowLeft aria-hidden />
+            Produk saya
+          </Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link href={`/farmer/products/${productId}/edit`}>
+            <Pencil aria-hidden />
+            Ubah produk
+          </Link>
+        </Button>
+      </div>
+    </aside>
   );
 }
 

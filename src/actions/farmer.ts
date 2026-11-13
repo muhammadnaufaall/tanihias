@@ -125,7 +125,8 @@ export async function saveProduct(previous: FormState, formData: FormData): Prom
   }
 
   revalidateProductPages();
-  redirect(`/farmer?status=${values.id ? "updated" : "added"}`);
+  // The product id lets the success toast link to the buyer's view of the product
+  redirect(`/farmer?status=${values.id ? "updated" : "added"}&product=${productId}`);
 }
 
 export async function deleteMyProduct(productId: string): Promise<ActionResult> {
