@@ -1,13 +1,3 @@
--- Sample data for development and demos. All names and numbers are fictional.
--- Password for every account: tanihias123 (stored as a bcrypt hash).
--- DELETE these accounts or change their passwords before UAT with real users.
--- Display data (names, product names, descriptions) stays in Indonesian
--- because it is shown in the UI.
-
--- ---------------------------------------------------------------------
--- Accounts (auth.users). The on_auth_user_created trigger creates the
--- users row and, for farmers, the business_profiles row.
--- ---------------------------------------------------------------------
 with accounts (id, email, name, role, created) as (
   values
     ('a0000000-0000-4000-8000-000000000001'::uuid, 'admin@tanihias.id',   'Admin Tanihias',  'buyer',  '2026-09-20 08:00+07'::timestamptz),
@@ -46,13 +36,9 @@ set created_at = u.created_at
 from auth.users u
 where u.id = p.id and u.id::text like 'a0000000-0000-4000-8000-%';
 
--- The admin role and the blocked status can only be set through SQL/admin
 update public.users set role = 'admin' where id = 'a0000000-0000-4000-8000-000000000001';
 update public.users set status = 'blocked' where id = 'a0000000-0000-4000-8000-000000000008';
 
--- ---------------------------------------------------------------------
--- Farmer business profiles
--- ---------------------------------------------------------------------
 update public.business_profiles b
 set business_name = v.business_name, location = v.location, whatsapp_number = v.whatsapp_number
 from (
@@ -64,9 +50,6 @@ from (
 ) as v (user_id, business_name, location, whatsapp_number)
 where b.user_id = v.user_id;
 
--- ---------------------------------------------------------------------
--- Products (no photos yet; the app shows an illustration per plant type)
--- ---------------------------------------------------------------------
 insert into public.products (business_id, plant_type_id, name, description, min_price, max_price, is_available, created_at)
 select b.id, t.id, v.name, v.description, v.min_price, v.max_price, v.is_available, v.created_at
 from (

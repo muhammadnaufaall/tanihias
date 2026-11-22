@@ -3,10 +3,6 @@ import { NextResponse, type NextRequest } from "next/server";
 import { homeForRole } from "@/lib/routes";
 import type { Role } from "@/lib/types";
 
-// Runs before every page:
-// 1. Refreshes the Supabase session token and writes its new cookies.
-// 2. A first access check. Pages, Server Actions, and RLS in the database
-//    check again before showing or changing data.
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
   let headerCache: Record<string, string> = {};
@@ -30,7 +26,6 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  // Do not put any other code between createServerClient and getClaims
   const { data } = await supabase.auth.getClaims();
   const userId = data?.claims?.sub;
 
@@ -42,7 +37,6 @@ export async function proxy(request: NextRequest) {
     return redirect;
   };
 
-  // The catalog is public, but product details and farmer contacts require signing in
   const requiresLogin =
     pathname.startsWith("/products/") || pathname.startsWith("/farmer") || pathname.startsWith("/admin");
   const isAuthPage = pathname === "/login" || pathname === "/register";
@@ -58,7 +52,6 @@ export async function proxy(request: NextRequest) {
     .eq("id", userId)
     .maybeSingle();
 
-  // Blocked or deleted accounts are treated as signed out
   if (!user || user.status !== "active") {
     return requiresLogin ? redirectTo("/login") : response;
   }
@@ -71,6 +64,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Every page except static files, so the session is always refreshed
   matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"],
 };

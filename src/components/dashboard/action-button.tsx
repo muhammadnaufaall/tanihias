@@ -18,12 +18,10 @@ import { Button } from "@/components/ui/button";
 import type { ActionResult } from "@/lib/types";
 
 type Props = {
-  // A Server Action already bound to an id, e.g. deleteAccount.bind(null, id)
   action: () => Promise<ActionResult>;
   children: ReactNode;
   variant?: "outline" | "destructive" | "ghost";
   disabled?: boolean;
-  // When set, the action runs only after the user confirms
   confirm?: { title: string; description: string; confirmLabel: string };
 };
 

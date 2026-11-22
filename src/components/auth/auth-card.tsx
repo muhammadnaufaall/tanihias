@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 
 type AuthTab = "login" | "register";
 
-// Wireframe Figure 3.7: centered card with Masuk / Daftar tabs above the form
 export function AuthCard({
   active,
   next,

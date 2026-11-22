@@ -14,7 +14,6 @@ import { getFarmerBusiness, getOtherBusinessProducts, getProduct } from "@/lib/d
 import { formatPriceRange, formatPriceTag, initials, whatsappLink } from "@/lib/format";
 import { requireSession } from "@/lib/session";
 
-// Wireframe Figure 3.10. This page requires signing in (checked in proxy.ts and here).
 export default function ProductPage({ params }: PageProps<"/products/[id]">) {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8">
@@ -125,8 +124,6 @@ async function ProductDetail({ params }: { params: PageProps<"/products/[id]">["
   );
 }
 
-// Shown only to the farmer who owns the product. Everything below it is
-// exactly what buyers see, so the farmer can check their listing.
 function OwnerPreviewBar({ productId }: { productId: string }) {
   return (
     <aside

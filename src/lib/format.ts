@@ -15,7 +15,6 @@ export function formatPriceRange(min: number, max: number) {
   return `${formatRupiah(min)} – ${formatRupiah(max)}`;
 }
 
-// The way farmers hand-write prices on plant tags: 15rb, 1,2jt
 function abbreviate(value: number) {
   if (value >= 1_000_000) {
     return `${(value / 1_000_000).toLocaleString("id-ID", { maximumFractionDigits: 1 })}jt`;
@@ -42,7 +41,6 @@ export function formatDate(iso: string) {
   return dateFormatter.format(new Date(iso));
 }
 
-// 0812xxxx or +62812xxxx becomes 62812xxxx for wa.me
 export function toInternationalNumber(phone: string) {
   const digits = phone.replace(/\D/g, "");
   if (digits.startsWith("62")) return digits;
@@ -63,7 +61,6 @@ export function initials(name: string) {
     .join("");
 }
 
-// Role labels shown in the UI
 export const ROLE_LABELS: Record<Role, string> = {
   buyer: "Pembeli",
   farmer: "Petani",

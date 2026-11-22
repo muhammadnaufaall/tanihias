@@ -25,7 +25,6 @@ const statusMessages: Record<string, string> = {
   updated: "Perubahan produk disimpan.",
 };
 
-// Wireframe Figure 3.11
 export default function MyProductsPage({ searchParams }: PageProps<"/farmer">) {
   return (
     <>

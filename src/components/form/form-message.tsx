@@ -20,7 +20,6 @@ export function FormSuccess({ message }: { message?: string }) {
   );
 }
 
-// Convert zod's list of error messages to the shape <FieldError> expects
 export function toFieldErrors(messages?: string[]) {
   return messages?.map((message) => ({ message }));
 }

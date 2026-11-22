@@ -7,7 +7,6 @@ import { listPlantTypes } from "@/lib/data";
 
 export const metadata: Metadata = { title: "Tambah produk" };
 
-// Wireframe Figure 3.12
 export default function NewProductPage() {
   return (
     <>

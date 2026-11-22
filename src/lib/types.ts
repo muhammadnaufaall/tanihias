@@ -1,6 +1,3 @@
-// Table and column names follow the schema in supabase/migrations, which
-// maps to the ERD (Figure 3.6). Passwords are not here: Supabase Auth stores them.
-
 export type Role = "buyer" | "farmer" | "admin";
 export type AccountStatus = "active" | "blocked";
 
@@ -41,7 +38,6 @@ export type Product = {
 export type ProductPhoto = {
   id: string;
   product_id: string;
-  // Path in the Storage bucket; url is its public address
   file_path: string;
   sort_order: number;
   url: string;
@@ -49,7 +45,6 @@ export type ProductPhoto = {
 
 export type ProductWithDetails = Product & {
   plantType: PlantType;
-  // The WhatsApp number is only filled in for signed-in users
   business: Pick<BusinessProfile, "id" | "business_name" | "location"> & { whatsapp_number?: string };
   photos: ProductPhoto[];
 };
@@ -58,5 +53,4 @@ export type Session = Pick<User, "id" | "name" | "email" | "role">;
 
 export type ProductSort = "newest" | "price_asc" | "price_desc";
 
-// Result of a Server Action triggered by a button (shown as a toast)
 export type ActionResult = { ok: boolean; message: string };

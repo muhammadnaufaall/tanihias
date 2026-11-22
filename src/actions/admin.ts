@@ -8,7 +8,6 @@ import { PHOTO_BUCKET, createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "@/lib/types";
 import { formValues, plantTypeSchema, type FormState } from "@/lib/validation";
 
-// Admin access is checked twice: here and by RLS in the database
 async function adminClient() {
   await requireSession("admin");
   return createClient();
@@ -18,7 +17,6 @@ function revalidateAll() {
   revalidatePath("/", "layout");
 }
 
-// Files in Storage are not removed by the database cascade
 async function removePhotoFiles(supabase: Awaited<ReturnType<typeof createClient>>, productIds: string[]) {
   if (productIds.length === 0) return;
   const { data } = await supabase.from("product_photos").select("file_path").in("product_id", productIds);
@@ -55,7 +53,6 @@ export async function deleteAccount(id: string): Promise<ActionResult> {
     .eq("business_profiles.user_id", id);
   await removePhotoFiles(supabase, (products ?? []).map((p) => p.id as string));
 
-  // Database function: deletes from auth.users, everything else cascades
   const { error } = await supabase.rpc("delete_user", { p_id: id });
   if (error) return { ok: false, message: `Akun belum terhapus: ${error.message}` };
 
@@ -75,7 +72,6 @@ export async function addPlantType(previous: FormState, formData: FormData): Pro
 
   const { error } = await supabase.from("plant_types").insert({ name: parsed.data.name });
   if (error) {
-    // 23505: unique violation (case-insensitive name index)
     if (error.code === "23505") return { errors: { name: ["Jenis ini sudah ada."] }, values, attempt };
     return { message: `Jenis belum tersimpan: ${error.message}`, values, attempt };
   }
@@ -90,7 +86,6 @@ export async function deletePlantType(id: string): Promise<ActionResult> {
     ? await supabase.from("plant_types").delete().eq("id", id).select("name")
     : { data: [], error: null };
 
-  // 23503: still used by products (foreign key on delete restrict)
   if (error?.code === "23503") {
     return { ok: false, message: "Jenis ini masih dipakai produk. Pindahkan atau hapus produknya dulu." };
   }

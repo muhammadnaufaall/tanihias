@@ -5,7 +5,6 @@ import { PlantTag } from "@/components/plant-tag";
 import { formatPriceRange, formatPriceTag } from "@/lib/format";
 import type { ProductWithDetails } from "@/lib/types";
 
-// The tag tilt is derived from the id so it stays the same on every render
 function tiltFromId(id: string) {
   const sum = [...id].reduce((total, char) => total + char.charCodeAt(0), 0);
   return (sum % 7) - 3;
@@ -34,7 +33,6 @@ export function ProductCard({ product }: { product: ProductWithDetails }) {
           <span aria-hidden>{formatPriceTag(product.min_price, product.max_price)}</span>
         </PlantTag>
       </div>
-      {/* On narrow screens the card body drops below the tag; on wide screens they sit side by side */}
       <div className="flex flex-1 flex-col gap-1 p-4 pt-7 sm:pt-4">
         <span className="text-xs font-medium text-muted-foreground sm:pr-24">{product.plantType.name}</span>
         <h3 className="font-sans text-base leading-snug font-semibold tracking-normal">{product.name}</h3>

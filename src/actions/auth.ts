@@ -7,7 +7,6 @@ import { createClient } from "@/lib/supabase/server";
 import type { Role } from "@/lib/types";
 import { formValues, loginSchema, registerSchema, type FormState } from "@/lib/validation";
 
-// Passwords are verified by Supabase Auth (bcrypt hash) and never stored by the app.
 export async function login(previous: FormState, formData: FormData): Promise<FormState> {
   const { password: _, ...values } = formValues(formData);
   const attempt = previous.attempt + 1;
@@ -61,7 +60,6 @@ export async function register(previous: FormState, formData: FormData): Promise
   }
 
   const supabase = await createClient();
-  // The on_auth_user_created trigger creates the users row (and a business profile for farmers)
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
@@ -69,7 +67,6 @@ export async function register(previous: FormState, formData: FormData): Promise
   });
 
   if (error) {
-    // U04: an email that is already registered is rejected
     if (error.code === "user_already_exists" || error.code === "email_exists") {
       return { errors: { email: ["Email ini sudah terdaftar. Masuk saja, atau pakai email lain."] }, values, attempt };
     }
@@ -82,7 +79,6 @@ export async function register(previous: FormState, formData: FormData): Promise
     return { message: `Belum bisa mendaftar: ${error.message}`, values, attempt };
   }
 
-  // If "Confirm email" is still enabled in Supabase, no session is created yet
   if (!data.session) {
     return {
       success: true,
@@ -91,7 +87,6 @@ export async function register(previous: FormState, formData: FormData): Promise
     };
   }
 
-  // New farmers are sent to complete their business profile first (Figure 3.3)
   if (parsed.data.role === "farmer") redirect("/farmer/profile");
   redirect(safeRedirectPath(values.next) ?? "/catalog");
 }

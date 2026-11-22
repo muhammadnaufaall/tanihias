@@ -10,7 +10,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ROLE_LABELS } from "@/lib/format";
 import { getSession } from "@/lib/session";
 
-// Wireframe Figures 3.11 / 3.12 / 3.8: top bar, side menu, main content
 export function DashboardShell({ role, children }: { role: DashboardRole; children: ReactNode }) {
   return (
     <div className="flex min-h-full flex-1 flex-col">

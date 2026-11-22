@@ -1,19 +1,3 @@
--- Tanihias database schema, following the ERD (Figure 3.6) and Table 3.3.
--- There is no Message entity because buyers and farmers talk over WhatsApp.
--- Search is not a table either: it is a query against the listed_products
--- view (Table 3.5).
---
--- Naming map to the report's ERD:
---   users (Pengguna), business_profiles (Profil Usaha), plant_types (Jenis
---   Tanaman), products (Produk), product_photos (Foto Produk).
---
--- User-facing strings (exception messages, plant type names) stay in
--- Indonesian because they can be shown in the UI.
-
--- =====================================================================
--- Tables
--- =====================================================================
-
 create table public.users (
   id uuid primary key references auth.users (id) on delete cascade,
   name text not null,
@@ -60,17 +44,11 @@ create index products_created_at_idx on public.products (created_at desc);
 create table public.product_photos (
   id uuid primary key default gen_random_uuid(),
   product_id uuid not null references public.products (id) on delete cascade,
-  -- Object path in the "product-photos" Storage bucket: <user_id>/<product_id>/<name>.jpg
   file_path text not null,
   sort_order smallint not null default 0
 );
 
 create index product_photos_product_id_idx on public.product_photos (product_id);
-
--- =====================================================================
--- RLS helper functions (security definer so they are not blocked by the
--- RLS on users, which the public must not be able to read)
--- =====================================================================
 
 create function public.is_admin()
 returns boolean
@@ -98,7 +76,6 @@ as $$
   );
 $$;
 
--- A business whose owner is not blocked; its products may appear in the catalog
 create function public.is_business_active(p_business_id uuid)
 returns boolean
 language sql
@@ -132,12 +109,6 @@ as $$
   );
 $$;
 
--- =====================================================================
--- New users from Supabase Auth
--- The role comes from the sign-up metadata and is only 'buyer' or 'farmer'.
--- Admins cannot be created through sign-up; promote them with SQL.
--- =====================================================================
-
 create function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -163,9 +134,6 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
--- Admin deletes an account. Deleting from auth.users cascades to users,
--- business_profiles, products, and product_photos (on delete cascade).
--- The app removes the photo files through the Storage API before calling this.
 create function public.delete_user(p_id uuid)
 returns void
 language plpgsql
@@ -186,18 +154,12 @@ $$;
 revoke execute on function public.delete_user(uuid) from public, anon;
 grant execute on function public.delete_user(uuid) to authenticated;
 
--- =====================================================================
--- Row Level Security
--- =====================================================================
-
 alter table public.users enable row level security;
 alter table public.business_profiles enable row level security;
 alter table public.plant_types enable row level security;
 alter table public.products enable row level security;
 alter table public.product_photos enable row level security;
 
--- users: only your own row; admins see every row and may only change the
--- status column (block) of non-admin users
 create policy "Users see their own row, admins see all"
   on public.users for select to authenticated
   using (id = (select auth.uid()) or (select public.is_admin()));
@@ -211,8 +173,6 @@ revoke all on public.users from anon;
 revoke insert, update, delete on public.users from authenticated;
 grant update (status) on public.users to authenticated;
 
--- business_profiles: name and location of active businesses appear in the
--- catalog. The WhatsApp number can only be read by signed-in users.
 create policy "Active business profiles are visible"
   on public.business_profiles for select to anon, authenticated
   using (
@@ -231,7 +191,6 @@ grant select (id, user_id, business_name, location) on public.business_profiles 
 revoke insert, update, delete on public.business_profiles from authenticated;
 grant update (business_name, location, whatsapp_number) on public.business_profiles to authenticated;
 
--- plant_types: readable by everyone, managed by admins
 create policy "Plant types are visible to everyone"
   on public.plant_types for select to anon, authenticated
   using (true);
@@ -246,7 +205,6 @@ create policy "Admins delete plant types"
 
 revoke insert, update, delete on public.plant_types from anon;
 
--- products
 create policy "Listed products are visible"
   on public.products for select to anon, authenticated
   using (
@@ -270,7 +228,6 @@ create policy "Farmers delete their products, admins take products down"
 
 revoke insert, update, delete on public.products from anon;
 
--- product_photos: follow the access rules of their product
 create policy "Product photos are visible"
   on public.product_photos for select to anon, authenticated
   using (exists (select 1 from public.products p where p.id = product_id));
@@ -293,14 +250,6 @@ create policy "Farmers or admins delete photos"
 revoke insert, update, delete on public.product_photos from anon;
 revoke update on public.product_photos from authenticated;
 
--- =====================================================================
--- Public catalog views (security_invoker: the RLS of the base tables
--- still applies)
--- =====================================================================
-
--- Products from farmers who are not blocked, joined with plant type and
--- business. search_text is used for case-insensitive substring matching
--- (Table 3.5).
 create view public.listed_products
 with (security_invoker = true)
 as
@@ -334,10 +283,6 @@ group by t.id, t.name;
 revoke all on public.listed_products, public.plant_type_summary from anon, authenticated;
 grant select on public.listed_products, public.plant_type_summary to anon, authenticated;
 
--- =====================================================================
--- Reference data: plant types (display names, shown in the UI)
--- =====================================================================
-
 insert into public.plant_types (name) values
   ('Bunga potong'),
   ('Anggrek'),
@@ -345,11 +290,6 @@ insert into public.plant_types (name) values
   ('Tanaman daun'),
   ('Pakis'),
   ('Kaktus & sukulen');
-
--- =====================================================================
--- Storage: product photos
--- Public bucket (images open by URL), max 2 MB, JPG/PNG (U09)
--- =====================================================================
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('product-photos', 'product-photos', true, 2097152, array['image/jpeg', 'image/png'])

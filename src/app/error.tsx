@@ -5,8 +5,6 @@ import { useEffect } from "react";
 import { PlantTag } from "@/components/plant-tag";
 import { Button } from "@/components/ui/button";
 
-// Shown when data fails to load, e.g. Supabase is not configured in
-// .env.local or cannot be reached.
 export default function ErrorPage({ error, retry }: { error: unknown; retry: () => void }) {
   useEffect(() => {
     console.error(error);

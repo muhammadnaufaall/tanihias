@@ -37,15 +37,6 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/*
- * Tanihias palette
- * mist        #EFF3EE  background, morning mist over the Cihideung highlands
- * polybag     #17211B  text, the greenish black of plant polybags
- * leaf        #1E5B3C  primary
- * shoot       #D9E8D3  soft surfaces, chips
- * bloom       #D23B73  accent, chrysanthemum pink (West Bandung's main crop)
- * greenhouse  #DCE9D6  UV greenhouse plastic (hero)
- */
 :root {
   --background: #eff3ee;
   --foreground: #17211b;
@@ -90,7 +81,6 @@
 }
 
 @layer components {
-  /* Greenhouse roof ribs: thin vertical lines on UV plastic */
   .greenhouse-film {
     background-color: var(--greenhouse);
     background-image:
@@ -102,7 +92,6 @@
       );
   }
 
-  /* Plant tag: white plastic with a pointed end for pushing into the pot */
   .plant-tag {
     clip-path: polygon(0 0, 100% 0, 100% 74%, 50% 100%, 0 74%);
   }

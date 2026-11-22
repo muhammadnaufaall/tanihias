@@ -9,8 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getLatestProducts, listPlantTypes } from "@/lib/data";
 
-// The public home page follows wireframe Figure 3.13 (hero + search,
-// plant types, latest products). Wireframe 3.8 is used for the admin dashboard.
 export default function HomePage() {
   return (
     <>
@@ -38,7 +36,6 @@ export default function HomePage() {
   );
 }
 
-// Plant tags standing in the hero's garden bed. Decorative; prices come from the sample data.
 const heroTags = [
   { name: "Krisan", price: "15rb", height: 132, tilt: -4 },
   { name: "Anggrek bulan", price: "85rb", height: 188, tilt: 3 },
@@ -79,7 +76,6 @@ function Hero() {
           </Form>
         </div>
 
-        {/* Garden bed: plant tags standing in the soil */}
         <div aria-hidden className="relative hidden items-end justify-center gap-5 md:flex lg:gap-8">
           {heroTags.map((tag, i) => (
             <div
@@ -98,7 +94,6 @@ function Hero() {
           ))}
         </div>
       </div>
-      {/* Garden bed soil */}
       <div
         aria-hidden
         className="relative z-10 hidden h-7 bg-foreground md:block"

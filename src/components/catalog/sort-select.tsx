@@ -9,7 +9,6 @@ export function SortSelect({ value }: { value: ProductSort }) {
       name="sort"
       aria-label="Urutkan produk"
       defaultValue={value}
-      // Apply the sort right away without pressing a button
       onChange={(e) => e.currentTarget.form?.requestSubmit()}
       className="[&_select]:h-10 [&_select]:bg-card"
     >

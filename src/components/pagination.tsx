@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 type Props = {
   page: number;
   totalPages: number;
-  // Created in a Server Component, never sent to the client
   href: (page: number) => string;
 };
 

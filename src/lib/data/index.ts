@@ -10,9 +10,6 @@ import type {
   User,
 } from "@/lib/types";
 
-// Data access layer (Supabase queries). Every query uses the user's
-// session, so Row Level Security in the database applies.
-
 export const PRODUCTS_PER_PAGE = 9;
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -22,8 +19,6 @@ function fail(context: string, error: { message: string }): never {
   throw new Error(`Failed to load ${context}: ${error.message}`);
 }
 
-/* ---------- Row mapping ---------- */
-
 const LISTED_COLUMNS =
   "id, business_id, plant_type_id, name, description, min_price, max_price, is_available, created_at, plant_type_name, business_name, location";
 
@@ -31,7 +26,6 @@ type ListedRow = Product & { plant_type_name: string; business_name: string; loc
 
 type PhotoRow = Omit<ProductPhoto, "url">;
 
-// A product from the products table with its relations (farmer and admin dashboards)
 const PRODUCT_RELATION_COLUMNS =
   "*, plant_types (id, name), business_profiles (id, business_name, location), product_photos (id, product_id, file_path, sort_order)";
 
@@ -78,8 +72,6 @@ async function withListedDetails(supabase: SupabaseClient, rows: ListedRow[]): P
   }));
 }
 
-/* ---------- Catalog (Table 3.5) ---------- */
-
 export type CatalogFilter = {
   q: string;
   plantTypes: string[];
@@ -89,7 +81,6 @@ export type CatalogFilter = {
   page: number;
 };
 
-// Strip ILIKE/PostgREST pattern characters so the keyword matches literally
 function sanitizeKeyword(q: string) {
   return q
     .trim()
@@ -100,16 +91,12 @@ function sanitizeKeyword(q: string) {
 export async function searchProducts(filter: CatalogFilter) {
   const supabase = await createClient();
 
-  // Step 2: normalize the keyword (trim + lowercase)
   const keyword = sanitizeKeyword(filter.q);
   const plantTypes = filter.plantTypes.filter(isValidUuid);
 
   const query = (columns: string, head = false) => {
     let q = supabase.from("listed_products").select(columns, { count: "exact", head });
-    // Step 3: substring match on name or plant type (search_text = name + plant type)
     if (keyword) q = q.ilike("search_text", `%${keyword}%`);
-    // Step 4: plant type and price range filters are combined with AND.
-    // A product matches when its price range overlaps the filter range.
     if (plantTypes.length > 0) q = q.in("plant_type_id", plantTypes);
     if (filter.min !== undefined) q = q.gte("max_price", filter.min);
     if (filter.max !== undefined) q = q.lte("min_price", filter.max);
@@ -124,7 +111,6 @@ export async function searchProducts(filter: CatalogFilter) {
   const page = Math.min(Math.max(1, filter.page), totalPages);
   const from = (page - 1) * PRODUCTS_PER_PAGE;
 
-  // Step 5: sort, then take one page
   let q = query(LISTED_COLUMNS);
   if (filter.sort === "price_asc") q = q.order("min_price", { ascending: true });
   else if (filter.sort === "price_desc") q = q.order("max_price", { ascending: false });
@@ -152,7 +138,6 @@ export async function getLatestProducts(limit: number) {
   return withListedDetails(supabase, data as ListedRow[]);
 }
 
-// Product detail: the WhatsApp number is only readable by signed-in users (RLS)
 export async function getProduct(id: string) {
   if (!isValidUuid(id)) return null;
   const supabase = await createClient();
@@ -195,8 +180,6 @@ export async function listPlantTypes() {
   }));
 }
 
-/* ---------- Farmer ---------- */
-
 export async function getFarmerBusiness(userId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -231,8 +214,6 @@ export async function getBusinessProduct(businessId: string, productId: string) 
   if (error) fail("product", error);
   return data ? fromRelationRow(supabase, data as unknown as ProductRelationRow) : null;
 }
-
-/* ---------- Admin (RLS: only admins see every row) ---------- */
 
 export async function getAdminStats() {
   const supabase = await createClient();

@@ -31,7 +31,6 @@ function revalidateProductPages() {
   revalidatePath("/");
 }
 
-// U09: validate files on the server (the Storage bucket also limits to 2 MB, JPG/PNG)
 function validatePhotos(photos: File[]) {
   if (photos.length > PHOTO_MAX_COUNT) return `Maksimal ${PHOTO_MAX_COUNT} foto per produk.`;
   if (photos.some((f) => !PHOTO_ALLOWED_TYPES.includes(f.type))) return "Format foto harus JPG atau PNG.";
@@ -87,7 +86,6 @@ export async function saveProduct(previous: FormState, formData: FormData): Prom
 
   let productId = values.id;
   if (productId) {
-    // U10: only products of your own business can be edited (also enforced by RLS)
     const { data } = isValidUuid(productId)
       ? await supabase.from("products").update(parsed.data).eq("id", productId).eq("business_id", businessId).select("id")
       : { data: [] };
@@ -111,11 +109,9 @@ export async function saveProduct(previous: FormState, formData: FormData): Prom
   }
 
   if (photos.length > 0) {
-    // New photos replace the old ones
     if (values.id) await deleteProductPhotos(supabase, productId);
     const uploadError = await uploadPhotos(supabase, session.id, productId, photos);
     if (uploadError) {
-      // Roll back a new product so it is not left half-saved
       if (!values.id) {
         await deleteProductPhotos(supabase, productId);
         await supabase.from("products").delete().eq("id", productId);
@@ -125,7 +121,6 @@ export async function saveProduct(previous: FormState, formData: FormData): Prom
   }
 
   revalidateProductPages();
-  // The product id lets the success toast link to the buyer's view of the product
   redirect(`/farmer?status=${values.id ? "updated" : "added"}&product=${productId}`);
 }
 

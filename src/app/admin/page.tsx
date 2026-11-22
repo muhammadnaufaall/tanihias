@@ -11,7 +11,6 @@ import { formatDate, formatPriceRange } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Dasbor admin" };
 
-// Wireframe Figure 3.8: four summary cards + a table of the latest products
 export default function AdminOverviewPage() {
   return (
     <>

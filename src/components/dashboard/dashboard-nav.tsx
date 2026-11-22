@@ -23,7 +23,6 @@ const menu: Record<DashboardRole, MenuItem[]> = {
   ],
 };
 
-// The active item is the one with the longest matching path prefix
 function activeItem(items: MenuItem[], pathname: string | null) {
   if (!pathname) return null;
   let best: { href: string; length: number } | null = null;
@@ -41,7 +40,6 @@ export function DashboardNav({ role }: { role: DashboardRole }) {
   return <DashboardMenu role={role} active={activeItem(menu[role], pathname)} />;
 }
 
-// No hooks, so it can be used as the <Suspense> fallback during prerender
 export function DashboardMenu({ role, active = null }: { role: DashboardRole; active?: string | null }) {
   return (
     <nav aria-label="Menu dasbor" className="flex gap-1 overflow-x-auto md:flex-col md:overflow-visible">

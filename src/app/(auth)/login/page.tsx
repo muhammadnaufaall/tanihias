@@ -39,7 +39,6 @@ async function LoginContent({ searchParams }: { searchParams: PageProps<"/login"
   );
 }
 
-// Accounts from supabase/seed.sql. Only shown during development (pnpm dev).
 function SampleAccounts() {
   const accounts = [
     ["Pembeli", "pembeli@tanihias.id"],

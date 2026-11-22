@@ -30,7 +30,6 @@ async function EditProductForm({ params }: { params: PageProps<"/farmer/products
     listPlantTypes(),
   ]);
 
-  // U10: products of another farmer, or ones that do not exist, cannot be opened
   if (!product) {
     return (
       <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed bg-card px-6 py-16 text-center">

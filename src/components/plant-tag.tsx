@@ -16,8 +16,6 @@ const sizeClasses = {
   lg: { tag: "min-w-36 px-4 pt-2.5 pb-8", content: "text-3xl" },
 };
 
-// The white plastic plant tag farmers write on with a marker and push into
-// the pot. Tanihias' signature element for showing prices.
 export function PlantTag({ children, title, size = "sm", tilt = 0, className, style }: Props) {
   const classes = sizeClasses[size];
   return (

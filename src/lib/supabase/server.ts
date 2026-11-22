@@ -15,13 +15,8 @@ export function getSupabaseEnv() {
   return { url, key };
 }
 
-// Supabase client for Server Components and Server Actions. Create a new one
-// for every request; the user session is read from cookies so RLS applies.
 export async function createClient() {
   const cookieStore = await cookies();
-  // The Supabase client calls Date.now() when checking token expiry.
-  // connection() defers this code to request time, so it does not run
-  // during Partial Prefetching (which rejects time values).
   await connection();
   const { url, key } = getSupabaseEnv();
 
@@ -33,10 +28,7 @@ export async function createClient() {
       setAll(cookiesToSet) {
         try {
           cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
-        } catch {
-          // Called from a Server Component (cookies cannot be written during render).
-          // Safe to ignore because proxy.ts already refreshes the session on every request.
-        }
+        } catch {}
       },
     },
   });

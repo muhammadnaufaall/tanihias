@@ -17,8 +17,6 @@ type Props = {
   hasFilters: boolean;
 };
 
-// Wireframe Figure 3.9: Filter box on the left (plant type checkboxes + price range).
-// The fields live inside the catalog <Form>, so their values are sent to the URL.
 export function FilterPanel({ plantTypes, selected, min, max, hasFilters }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 

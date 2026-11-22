@@ -13,7 +13,6 @@ const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
 });
 
-// Only for the marker handwriting on plant tags
 const kalam = Kalam({
   variable: "--font-kalam",
   subsets: ["latin"],

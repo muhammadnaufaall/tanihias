@@ -19,12 +19,10 @@ type Props = {
   product?: ProductWithDetails;
 };
 
-// Wireframe Figure 3.12: product data on the left, description and photos on the right
 export function ProductForm({ plantTypes, product }: Props) {
   const [state, formAction, isPending] = useActionState(saveProduct, initialFormState);
   const errors = state.errors;
 
-  // Initial value: the last submitted input, then the product data, then empty
   const initial = (field: keyof Product) =>
     state.values?.[field] ?? (product ? String(product[field]) : undefined);
   const isAvailable = state.values
@@ -120,8 +118,6 @@ export function ProductForm({ plantTypes, product }: Props) {
   );
 }
 
-// U09: checked in the browser for quick feedback, then checked again on the server.
-// Photos picked while editing a product replace the existing ones.
 function PhotoUpload({ existingPhotos, serverErrors }: { existingPhotos: ProductPhoto[]; serverErrors?: string[] }) {
   const [previews, setPreviews] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);

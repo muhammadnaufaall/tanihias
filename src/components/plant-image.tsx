@@ -2,8 +2,6 @@ import Image from "next/image";
 import { Clover, Flower, Flower2, Leaf, type LucideIcon, Sprout, Vegan } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Placeholder illustration while a product has no real photo, picked by plant type.
-// Keys are the lowercased plant type names from the reference data (Indonesian).
 const typeStyles: Record<string, { icon: LucideIcon; background: string; color: string }> = {
   "bunga potong": { icon: Flower2, background: "#f6dce6", color: "#b02a5e" },
   anggrek: { icon: Flower, background: "#e9e0f3", color: "#6b3fa0" },
@@ -14,7 +12,6 @@ const typeStyles: Record<string, { icon: LucideIcon; background: string; color: 
 };
 const fallbackStyle = { icon: Sprout, background: "#e3eae1", color: "#1e5b3c" };
 
-// Angle variations so several illustrated "photos" do not look identical
 const iconVariants = [
   "rotate-0 scale-100",
   "-rotate-12 scale-90 translate-x-[12%]",
